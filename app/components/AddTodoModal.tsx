@@ -33,6 +33,12 @@ export default function AddTodoModal({
 }: AddTodoModalProps) {
   const textRef = useRef<TextInput>(null);
 
+  const isToday =
+    dueDate &&
+    dueDate.getDate() === new Date().getDate() &&
+    dueDate.getMonth() === new Date().getMonth() &&
+    dueDate.getFullYear() === new Date().getFullYear();
+
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.modalContainer}>
@@ -88,6 +94,7 @@ export default function AddTodoModal({
               value={dueDate || new Date()}
               mode="date"
               display="default"
+              minimumDate={new Date()} // Empêche de choisir une date passée
               onChange={(_, selectedDate) => {
                 setShowDate(false);
                 if (selectedDate) {
@@ -104,6 +111,7 @@ export default function AddTodoModal({
               mode="time"
               is24Hour={true}
               display="default"
+              minimumDate={isToday ? new Date() : undefined}
               onChange={(_, selectedTime) => {
                 setShowTime(false);
                 if (selectedTime) {
@@ -135,7 +143,7 @@ export default function AddTodoModal({
               />
             ))}
           </View>
-          <TouchableOpacity onPress={onAdd} style={styles.saveBtn}>
+          <TouchableOpacity onPress={onAdd} style={[styles.saveBtn, !text.trim() && { opacity: 0.5 }] } disabled={!text.trim()}>
             <Text style={styles.saveBtnText}>Ajouter</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>

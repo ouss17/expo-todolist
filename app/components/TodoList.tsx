@@ -35,7 +35,14 @@ export default function TodoList({ todos, onPress }: TodoListProps) {
           <TouchableOpacity
             style={[
               styles.todoItem,
-              { backgroundColor: item.color || '#A1CEDC', flex: 1, opacity: item.completed ? 0.5 : 1 }
+              {
+                backgroundColor:
+                  !item.completed && item.dueDate && new Date(item.dueDate) < new Date()
+                    ? '#FFCDD2' // rouge clair si en retard
+                    : item.color || '#A1CEDC',
+                flex: 1,
+                opacity: item.completed ? 0.5 : 1,
+              },
             ]}
             onPress={() => onPress(item)}
           >

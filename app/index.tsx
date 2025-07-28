@@ -49,8 +49,13 @@ export default function HomeScreen() {
 
   // Handlers
   const handleAddTodo = () => {
-    if (!title) return;
-    dispatch(addTodo({ title, text, dueDate: dueDate ? dueDate.toISOString() : undefined, category, color }));
+    if (!text.trim()) return; // Empêche la validation si la description est vide
+    const todoTitle = title.trim()
+      ? title
+      : text.trim().length > 30
+        ? text.trim().slice(0, 30) + '...'
+        : text.trim();
+    dispatch(addTodo({ title: todoTitle, text, dueDate: dueDate ? dueDate.toISOString() : undefined, category, color }));
     setTitle('');
     setText('');
     setDueDate(null);

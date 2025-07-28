@@ -39,7 +39,7 @@ export default function CategoryChips({
           { color: THEMES[theme].color },
           !categoryFilter && styles.categoryChipTextSelected
         ]}>
-          Toutes
+          Toutes les catégories
         </Text>
       </TouchableOpacity>
       {categories.map(cat => (
@@ -125,7 +125,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#ccc',
   },
   categoryChipSelected: {
-    backgroundColor: '#1D3D47', borderColor: '#1D3D47',
+    backgroundColor: '#7C3AED', // Violet foncé, bien visible
+    borderColor: '#7C3AED',
   },
   categoryChipText: {
     fontSize: 14, color: '#333',

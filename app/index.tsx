@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from './redux/store';
-import { addTodo } from './redux/todosSlice';
+import { addTodo, editTodo } from './redux/todosSlice';
 import { addCategory, removeCategory } from './redux/categoriesSlice';
 import { setTheme } from './redux/backgroundSlice';
 import { removeTodosByCategory, removeAllTodos } from './redux/todosSlice';
@@ -119,7 +119,13 @@ export default function HomeScreen() {
       <TodoModal
         visible={modalVisible}
         todo={detailTodo}
+        categories={categories}
         onClose={() => setModalVisible(false)}
+        onEdit={updated => {
+          if (!detailTodo?.id) return;
+          dispatch(editTodo({ ...updated, id: detailTodo.id }));
+          setDetailTodo({ ...detailTodo, ...updated, id: detailTodo.id });
+        }}
       />
 
       {/* Modal ajout todo */}

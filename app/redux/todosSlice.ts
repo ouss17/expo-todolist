@@ -57,8 +57,14 @@ export const todosSlice = createSlice({
     removeAllTodos: (state) => {
       state.todos = [];
     },
+    editTodo: (state, action: PayloadAction<Partial<Todo> & { id: string }>) => {
+      const todo = state.todos.find(t => t.id === action.payload.id);
+      if (todo) {
+        Object.assign(todo, action.payload);
+      }
+    },
   },
 });
 
-export const { addTodo, toggleTodo, removeTodo, removeTodosByCategory, removeAllTodos } = todosSlice.actions;
+export const { addTodo, toggleTodo, removeTodo, removeTodosByCategory, removeAllTodos, editTodo } = todosSlice.actions;
 export default todosSlice.reducer;

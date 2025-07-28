@@ -1,50 +1,51 @@
-# Welcome to your Expo app 👋
+# ToDo'Réac'tion
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+ToDo'Réac'tion est une application de gestion de tâches moderne, réalisée avec React Native, Redux Toolkit et Expo Router.
 
-## Get started
+---
 
-1. Install dependencies
+## Fonctionnalités principales
+
+- **Ajout, édition et suppression de tâches**
+- **Gestion de la date et de l'heure d'échéance** pour chaque tâche
+- **Catégorisation des tâches** : crée tes propres catégories, choisis leur couleur, filtre les tâches par catégorie grâce à des "chips"
+- **Palette de couleurs** : chaque tâche peut avoir une couleur personnalisée parmi 10 proposées
+- **Thèmes visuels** : change le fond de l'application (clair, sombre, bleu, etc.), le choix est persistant
+- **Interface moderne et responsive** : expérience utilisateur fluide sur mobile
+
+---
+
+## Prise en main
+
+1. **Installer les dépendances**
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. **Démarrer l'application**
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+Dans la sortie, vous trouverez des options pour ouvrir l'app dans :
+- un [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- un [émulateur Android](https://docs.expo.dev/workflow/android-studio-emulator/)
+- un [simulateur iOS](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), un bac à sable pour tester rapidement
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Vous pouvez commencer à développer en éditant les fichiers dans le dossier **app**. Ce projet utilise le [routing basé sur les fichiers](https://docs.expo.dev/router/introduction).
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## Ressources utiles
 
-When you're ready, run:
+- [Expo documentation](https://docs.expo.dev/)
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/)
+- [Expo sur GitHub](https://github.com/expo/expo)
+- [Discord Expo](https://chat.expo.dev)
 
-```bash
-npm run reset-project
-```
+---
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Projet réalisé pour apprendre et pratiquer React Native, Redux et la conception d'interfaces mobiles modernes.**

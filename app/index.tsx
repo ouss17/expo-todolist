@@ -1,0 +1,194 @@
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from './redux/store';
+import { addTodo } from './redux/todosSlice';
+import { addCategory } from './redux/categoriesSlice';
+import { setTheme } from './redux/backgroundSlice';
+import type { Todo } from './redux/todosSlice';
+
+import TodoList from './components/TodoList';
+import TodoModal from './components/TodoModal';
+import AddTodoModal from './components/AddTodoModal';
+import CategoryChips from './components/CategoryChips';
+import AddCategoryModal from './components/AddCategoryModal';
+
+const THEMES = {
+  white: { backgroundColor: '#81C784', color: '#222' },
+  dark: { backgroundColor: '#222', color: '#fff' },
+  blue: { backgroundColor: '#1D3D47', color: '#A1CEDC' },
+};
+const APP_TITLE = "ToDo'Réac'tion";
+const COLOR_PALETTE = [
+  '#A1CEDC', '#FFB6B9', '#F7D6E0', '#B5EAD7', '#FFDAC1',
+  '#C7CEEA', '#FF9AA2', '#E2F0CB', '#FFB347', '#B39CD0'
+];
+
+export default function HomeScreen() {
+  // States principaux
+  const [modalVisible, setModalVisible] = useState(false);
+  const [detailTodo, setDetailTodo] = useState<any>(null);
+  const [addModal, setAddModal] = useState(false);
+  const [title, setTitle] = useState('');
+  const [text, setText] = useState('');
+  const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [showDate, setShowDate] = useState(false);
+  const [showTime, setShowTime] = useState(false);
+  const [category, setCategory] = useState('');
+  const [color, setColor] = useState(COLOR_PALETTE[0]);
+  const [categoryFilter, setCategoryFilter] = useState<string>('');
+  const [addCategoryModal, setAddCategoryModal] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+
+  // Redux
+  const todos = useSelector((state: RootState) => state.todos.todos);
+  const categories = useSelector((state: RootState) => state.categories.categories);
+  const theme = useSelector((state: RootState) => state.background.theme);
+  const dispatch = useDispatch();
+
+  // Handlers
+  const handleAddTodo = () => {
+    if (!title) return;
+    dispatch(addTodo({ title, text, dueDate: dueDate ? dueDate.toISOString() : undefined, category, color }));
+    setTitle('');
+    setText('');
+    setDueDate(null);
+    setCategory('');
+    setColor(COLOR_PALETTE[0]);
+    setAddModal(false);
+  };
+
+  const handleAddCategory = () => {
+    if (!newCategory) return;
+    dispatch(addCategory({ name: newCategory, color }));
+    setNewCategory('');
+    setAddCategoryModal(false);
+  };
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: THEMES[theme].backgroundColor }]}>
+      {/* Sélecteur de thème */}
+      <View style={styles.themeSelector}>
+        <TouchableOpacity onPress={() => dispatch(setTheme('white'))} style={[styles.themeBtn, { backgroundColor: '#81C784' }]} />
+        <TouchableOpacity onPress={() => dispatch(setTheme('dark'))} style={[styles.themeBtn, { backgroundColor: '#222' }]} />
+        <TouchableOpacity onPress={() => dispatch(setTheme('blue'))} style={[styles.themeBtn, { backgroundColor: '#1D3D47' }]} />
+      </View>
+
+      {/* Titre */}
+      <Text style={[styles.title, { color: THEMES[theme].color }]}>{APP_TITLE}</Text>
+
+      {/* Chips catégories */}
+      <CategoryChips
+        categories={categories}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
+        theme={theme}
+        onAddCategory={() => setAddCategoryModal(true)}
+        THEMES={THEMES}
+      />
+
+      {/* Liste des todos */}
+      <TodoList
+        todos={categoryFilter ? todos.filter(todo => todo.category === categoryFilter) : todos}
+        onPress={(todo: Todo) => { setDetailTodo(todo); setModalVisible(true); }}
+      />
+
+      {/* Bouton + */}
+      <TouchableOpacity style={styles.addButton} onPress={() => setAddModal(true)}>
+        <Text style={styles.addButtonText}>+</Text>
+      </TouchableOpacity>
+
+      {/* Modal détail todo */}
+      <TodoModal
+        visible={modalVisible}
+        todo={detailTodo}
+        onClose={() => setModalVisible(false)}
+      />
+
+      {/* Modal ajout todo */}
+      <AddTodoModal
+        visible={addModal}
+        title={title}
+        setTitle={setTitle}
+        text={text}
+        setText={setText}
+        category={category}
+        setCategory={setCategory}
+        categories={categories}
+        dueDate={dueDate}
+        setDueDate={setDueDate}
+        showDate={showDate}
+        setShowDate={setShowDate}
+        showTime={showTime}
+        setShowTime={setShowTime}
+        color={color}
+        setColor={setColor}
+        COLOR_PALETTE={COLOR_PALETTE}
+        onAdd={handleAddTodo}
+        onClose={() => setAddModal(false)}
+      />
+
+      {/* Modal ajout catégorie */}
+      <AddCategoryModal
+        visible={addCategoryModal}
+        newCategory={newCategory}
+        setNewCategory={setNewCategory}
+        onAddCategory={handleAddCategory}
+        onClose={() => setAddCategoryModal(false)}
+      />
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  themeSelector: { flexDirection: 'row', justifyContent: 'center', margin: 16, gap: 16, top: 20 },
+  themeBtn: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: '#ccc' },
+  title: { fontSize: 32, fontWeight: 'bold', textAlign: 'center', marginBottom: 16, marginTop: 8 },
+  todoItem: { borderRadius: 12, margin: 8, padding: 16 },
+  todoCreatedAt: { fontSize: 12, color: '#555' },
+  todoTitle: { fontSize: 18, fontWeight: 'bold', marginVertical: 4 },
+  todoDueDate: { fontSize: 14, color: '#333' },
+  addButton: {
+    position: 'absolute', right: 24, bottom: 60, backgroundColor: '#1D3D47',
+    width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', elevation: 4,
+  },
+  addButtonText: { color: '#fff', fontSize: 32, fontWeight: 'bold' },
+  modalContainer: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { backgroundColor: '#fff', borderRadius: 16, padding: 24, width: '80%', alignItems: 'center' },
+  modalTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 8 },
+  modalDate: { fontSize: 14, color: '#555', marginBottom: 4 },
+  modalText: { fontSize: 16, marginVertical: 8 },
+  modalCategory: { fontSize: 14, color: '#1D3D47', marginBottom: 8 },
+  closeBtn: { marginTop: 12, padding: 8 },
+  closeBtnText: { color: '#1D3D47', fontWeight: 'bold' },
+  saveBtn: { backgroundColor: '#1D3D47', padding: 12, borderRadius: 8, marginTop: 8, width: '100%', alignItems: 'center' },
+  saveBtnText: { color: '#fff', fontWeight: 'bold' },
+  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginVertical: 4, width: '100%' },
+  dateBtn: {
+    flex: 1, backgroundColor: '#f0f0f0', borderRadius: 8, padding: 12, marginHorizontal: 4,
+    justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#ccc',
+  },
+  dateBtnText: { fontSize: 16, color: '#333' },
+  colorCircle: {
+    width: 36, height: 36, borderRadius: 18, marginHorizontal: 4,
+    justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#fff',
+  },
+  addCategoryButton: {
+    position: 'absolute', left: 24, bottom: 24, backgroundColor: '#FFB6B9',
+    padding: 12, borderRadius: 8, width: '40%', alignItems: 'center', elevation: 4,
+  },
+  categoryChip: {
+    paddingVertical: 8, paddingHorizontal: 12, borderRadius: 16, margin: 4,
+    justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#ccc',
+  },
+  categoryChipSelected: {
+    backgroundColor: '#1D3D47', borderColor: '#1D3D47',
+  },
+  categoryChipText: {
+    fontSize: 14, color: '#333',
+  },
+  categoryChipTextSelected: {
+    color: '#fff', fontWeight: 'bold',
+  },
+});

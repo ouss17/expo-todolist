@@ -3,8 +3,9 @@ import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-na
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from './redux/store';
 import { addTodo } from './redux/todosSlice';
-import { addCategory } from './redux/categoriesSlice';
+import { addCategory, removeCategory } from './redux/categoriesSlice';
 import { setTheme } from './redux/backgroundSlice';
+import { removeTodosByCategory, removeAllTodos } from './redux/todosSlice';
 import type { Todo } from './redux/todosSlice';
 
 import TodoList from './components/TodoList';
@@ -14,8 +15,8 @@ import CategoryChips from './components/CategoryChips';
 import AddCategoryModal from './components/AddCategoryModal';
 
 const THEMES = {
-  white: { backgroundColor: '#81C784', color: '#222' },
   dark: { backgroundColor: '#222', color: '#fff' },
+  white: { backgroundColor: '#81C784', color: '#222' },
   blue: { backgroundColor: '#1D3D47', color: '#A1CEDC' },
 };
 const APP_TITLE = "ToDo'Réac'tion";
@@ -69,8 +70,8 @@ export default function HomeScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: THEMES[theme].backgroundColor }]}>
       {/* Sélecteur de thème */}
       <View style={styles.themeSelector}>
-        <TouchableOpacity onPress={() => dispatch(setTheme('white'))} style={[styles.themeBtn, { backgroundColor: '#81C784' }]} />
         <TouchableOpacity onPress={() => dispatch(setTheme('dark'))} style={[styles.themeBtn, { backgroundColor: '#222' }]} />
+        <TouchableOpacity onPress={() => dispatch(setTheme('white'))} style={[styles.themeBtn, { backgroundColor: '#81C784' }]} />
         <TouchableOpacity onPress={() => dispatch(setTheme('blue'))} style={[styles.themeBtn, { backgroundColor: '#1D3D47' }]} />
       </View>
 
@@ -84,6 +85,17 @@ export default function HomeScreen() {
         setCategoryFilter={setCategoryFilter}
         theme={theme}
         onAddCategory={() => setAddCategoryModal(true)}
+        onDeleteCategory={(id, name) => {
+          dispatch(removeCategory(id));
+          dispatch(removeTodosByCategory(name));
+        }}
+        onDeleteAllTodos={() => {
+          if (categoryFilter) {
+            dispatch(removeTodosByCategory(categoryFilter));
+          } else {
+            dispatch(removeAllTodos());
+          }
+        }}
         THEMES={THEMES}
       />
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import type { Category } from '../redux/categoriesSlice';
 
 interface CategoryChipsProps {
@@ -8,6 +9,8 @@ interface CategoryChipsProps {
   setCategoryFilter: (v: string) => void;
   theme: 'white' | 'dark' | 'blue';
   onAddCategory: () => void;
+  onDeleteCategory?: (id: string, name: string) => void;
+  onDeleteAllTodos?: () => void;
   THEMES: Record<string, { backgroundColor: string; color: string }>;
 }
 
@@ -17,6 +20,8 @@ export default function CategoryChips({
   setCategoryFilter,
   theme,
   onAddCategory,
+  onDeleteCategory,
+  onDeleteAllTodos,
   THEMES
 }: CategoryChipsProps) {
   return (
@@ -38,22 +43,43 @@ export default function CategoryChips({
         </Text>
       </TouchableOpacity>
       {categories.map(cat => (
-        <TouchableOpacity
-          key={cat.id}
-          style={[
-            styles.categoryChip,
-            { backgroundColor: cat.color },
-            categoryFilter === cat.name && styles.categoryChipSelected,
-          ]}
-          onPress={() => setCategoryFilter(cat.name)}
-        >
-          <Text style={[
-            styles.categoryChipText,
-            categoryFilter === cat.name && styles.categoryChipTextSelected
-          ]}>
-            {cat.name}
-          </Text>
-        </TouchableOpacity>
+        <View key={cat.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity
+            style={[
+              styles.categoryChip,
+              { backgroundColor: cat.color },
+              categoryFilter === cat.name && styles.categoryChipSelected,
+            ]}
+            onPress={() => setCategoryFilter(cat.name)}
+          >
+            <Text style={[
+              styles.categoryChipText,
+              categoryFilter === cat.name && styles.categoryChipTextSelected
+            ]}>
+              {cat.name}
+            </Text>
+          </TouchableOpacity>
+          {onDeleteCategory && (
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert(
+                  'Supprimer la catégorie',
+                  `Supprimer "${cat.name}" et toutes ses tâches ?`,
+                  [
+                    { text: 'Annuler', style: 'cancel' },
+                    {
+                      text: 'Supprimer',
+                      style: 'destructive',
+                      onPress: () => onDeleteCategory && onDeleteCategory(cat.id, cat.name),
+                    },
+                  ]
+                );
+              }}
+            >
+              <MaterialIcons name="delete" size={20} color="#c00" style={{ marginLeft: -8, marginRight: 4 }} />
+            </TouchableOpacity>
+          )}
+        </View>
       ))}
       <TouchableOpacity
         style={[
@@ -66,6 +92,29 @@ export default function CategoryChips({
           Ajouter une catégorie
         </Text>
       </TouchableOpacity>
+      {onDeleteAllTodos && (
+        <TouchableOpacity
+          onPress={() => {
+            Alert.alert(
+              categoryFilter ? 'Supprimer toutes les tâches de cette catégorie' : 'Supprimer toutes les tâches',
+              categoryFilter
+                ? `Supprimer toutes les tâches de "${categoryFilter}" ?`
+                : 'Supprimer toutes les tâches de toutes les catégories ?',
+              [
+                { text: 'Annuler', style: 'cancel' },
+                {
+                  text: 'Supprimer',
+                  style: 'destructive',
+                  onPress: onDeleteAllTodos,
+                },
+              ]
+            );
+          }}
+          style={{ marginRight: 8 }}
+        >
+          <MaterialIcons name="delete-forever" size={22} color="#c00" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

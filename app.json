@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ToDo'Réac'tion",
-    "slug": "ToDo'Réac'tion",
+    "slug": "todoreaction",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/list.png",
@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/list.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.rsmane.todoreaction"
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +38,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "192df82a-5f72-444a-9743-5bdb4cc3d759"
+      }
     }
   }
 }

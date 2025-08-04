@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from './redux/store';
 import { addTodo, editTodo } from './redux/todosSlice';
@@ -7,6 +7,9 @@ import { addCategory, removeCategory } from './redux/categoriesSlice';
 import { setTheme } from './redux/backgroundSlice';
 import { removeTodosByCategory, removeAllTodos } from './redux/todosSlice';
 import type { Todo } from './redux/todosSlice';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import * as DocumentPicker from 'expo-document-picker';
 
 import TodoList from './components/TodoList';
 import TodoModal from './components/TodoModal';
@@ -71,6 +74,70 @@ export default function HomeScreen() {
     setAddCategoryModal(false);
   };
 
+  const handleExport = async () => {
+    const dataStr = JSON.stringify(todos, null, 2);
+    const fileUri = FileSystem.cacheDirectory + 'todolist.json';
+    await FileSystem.writeAsStringAsync(fileUri, dataStr, { encoding: FileSystem.EncodingType.UTF8 });
+    await Sharing.shareAsync(fileUri);
+  };
+
+
+  const handleImport = async () => {
+    const result = await DocumentPicker.getDocumentAsync({ type: 'application/json', copyToCacheDirectory: true });
+    if (result.canceled || !result.assets?.[0]?.uri) return;
+
+    try {
+      const fileUri = result.assets[0].uri;
+      const content = await FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.UTF8 });
+      const importedTodos = JSON.parse(content);
+
+      Alert.alert(
+        'Importer la liste',
+        'Que souhaitez-vous faire avec les tâches importées ?',
+        [
+          {
+            text: 'Ajouter aux tâches existantes',
+            onPress: () => {
+              // Ajoute les todos importées à la liste existante
+              importedTodos.forEach((todo: Todo) => {
+                // Vérifie si l'id existe déjà pour éviter les doublons
+                if (!todos.some(t => t.id === todo.id)) {
+                  dispatch(addTodo({
+                    title: todo.title,
+                    text: todo.text,
+                    dueDate: todo.dueDate,
+                    category: todo.category,
+                    color: todo.color,
+                  }));
+                }
+              });
+            },
+          },
+          {
+            text: 'Écraser la liste',
+            style: 'destructive',
+            onPress: () => {
+              // Remplace toute la liste (reset)
+              dispatch(removeAllTodos());
+              importedTodos.forEach((todo: Todo) => {
+                dispatch(addTodo({
+                  title: todo.title,
+                  text: todo.text,
+                  dueDate: todo.dueDate,
+                  category: todo.category,
+                  color: todo.color,
+                }));
+              });
+            },
+          },
+          { text: 'Annuler', style: 'cancel' },
+        ]
+      );
+    } catch (e) {
+      Alert.alert('Erreur', "Impossible d'importer ce fichier.");
+    }
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: THEMES[theme].backgroundColor }]}>
       {/* Sélecteur de thème */}
@@ -80,8 +147,26 @@ export default function HomeScreen() {
         <TouchableOpacity onPress={() => dispatch(setTheme('blue'))} style={[styles.themeBtn, { backgroundColor: '#1D3D47' }]} />
       </View>
 
-      {/* Titre */}
-      <Text style={[styles.title, { color: THEMES[theme].color }]}>{APP_TITLE}</Text>
+      {/* Header avec le titre et le bouton d'importation */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Bouton Import */}
+        <TouchableOpacity
+          style={{
+            marginRight: 12,
+            backgroundColor: '#1976D2',
+            borderRadius: 12,
+            paddingHorizontal: 20,
+            height: 48,
+            justifyContent: 'center',
+            alignItems: 'center',
+            minWidth: 90,
+          }}
+          onPress={handleImport}
+        >
+          <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold' }}>Import</Text>
+        </TouchableOpacity>
+        <Text style={[styles.title, { color: THEMES[theme].color }]}>{APP_TITLE}</Text>
+      </View>
 
       {/* Chips catégories */}
       <CategoryChips
@@ -111,8 +196,32 @@ export default function HomeScreen() {
       />
 
       {/* Bouton + */}
-      <TouchableOpacity style={styles.addButton} onPress={() => setAddModal(true)}>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => {
+          setCategory(categoryFilter); // <-- ici, on pré-sélectionne la catégorie filtrée
+          setAddModal(true);
+        }}
+      >
         <Text style={styles.addButtonText}>+</Text>
+      </TouchableOpacity>
+
+      {/* Bouton Export */}
+      <TouchableOpacity
+        style={[
+          styles.addButton,
+          {
+            left: 35,
+            backgroundColor: '#1976D2',
+            width: 90, // plus large
+            borderRadius: 12,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }
+        ]}
+        onPress={handleExport}
+      >
+        <Text style={[styles.addButtonText, { fontSize: 20, textAlign: 'center' }]}>Export</Text>
       </TouchableOpacity>
 
       {/* Modal détail todo */}
@@ -173,10 +282,24 @@ const styles = StyleSheet.create({
   todoTitle: { fontSize: 18, fontWeight: 'bold', marginVertical: 4 },
   todoDueDate: { fontSize: 14, color: '#333' },
   addButton: {
-    position: 'absolute', right: 24, bottom: 60, backgroundColor: '#1D3D47',
-    width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', elevation: 4,
+    position: 'absolute',
+    right: 24,
+    bottom: 60,
+    backgroundColor: '#1D3D47',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
   },
-  addButtonText: { color: '#fff', fontSize: 32, fontWeight: 'bold' },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 32,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    lineHeight: 40, // Ajoute cette ligne pour mieux centrer verticalement
+  },
   modalContainer: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { backgroundColor: '#fff', borderRadius: 16, padding: 24, width: '80%', alignItems: 'center' },
   modalTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 8 },

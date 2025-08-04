@@ -17,7 +17,7 @@ export default function TodoList({ todos, onPress }: TodoListProps) {
     <FlatList
       data={todos}
       keyExtractor={item => item.id}
-      contentContainerStyle={{ paddingBottom: 80 }}
+      contentContainerStyle={{ paddingBottom: 140 }}
       renderItem={({ item }) => (
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           {/* Bouton marquer comme fait */}

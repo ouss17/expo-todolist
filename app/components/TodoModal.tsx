@@ -39,7 +39,12 @@ export default function TodoModal({ visible, todo, categories, onClose, onEdit }
           {isEditing ? (
             <>
               <TextInput value={title} onChangeText={setTitle} style={styles.input} placeholder="Titre" />
-              <TextInput value={text} onChangeText={setText} style={styles.input} placeholder="Description" multiline />
+              <TextInput
+                value={text}
+                onChangeText={setText}
+                style={[styles.input, { minHeight: 80, textAlignVertical: 'top' }]}
+                multiline
+              />
               <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }}>
                 <TouchableOpacity style={styles.dateBtn} onPress={() => setShowDate(true)}>
                   <Text style={styles.dateBtnText}>

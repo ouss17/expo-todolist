@@ -57,7 +57,8 @@ export default function AddTodoModal({
             placeholder="Description"
             value={text}
             onChangeText={setText}
-            style={styles.input}
+            style={[styles.input, { minHeight: 80, textAlignVertical: 'top' }]} // minHeight pour textarea
+            multiline
           />
           <View style={{ width: '100%', marginVertical: 8 }}>
             <Picker

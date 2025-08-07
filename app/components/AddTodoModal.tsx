@@ -44,6 +44,9 @@ export default function AddTodoModal({
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Nouvelle tâche</Text>
+
+          {/* Label Titre */}
+          <Text style={styles.label}>Titre</Text>
           <TextInput
             placeholder="Titre"
             value={title}
@@ -52,14 +55,23 @@ export default function AddTodoModal({
             returnKeyType="next"
             onSubmitEditing={() => textRef.current?.focus()}
           />
+
+          {/* Label Description avec * */}
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.label}>Description</Text>
+            <Text style={{ color: '#c00', marginLeft: 2 }}>*</Text>
+          </View>
           <TextInput
             ref={textRef}
             placeholder="Description"
             value={text}
             onChangeText={setText}
-            style={[styles.input, { minHeight: 80, textAlignVertical: 'top' }]} // minHeight pour textarea
+            style={[styles.input, { minHeight: 80, textAlignVertical: 'top' }]}
             multiline
           />
+
+          {/* Label Catégorie */}
+          <Text style={styles.label}>Catégorie</Text>
           <View style={{ width: '100%', marginVertical: 8 }}>
             <Picker
               selectedValue={category}
@@ -72,6 +84,9 @@ export default function AddTodoModal({
               ))}
             </Picker>
           </View>
+
+          {/* Label Date butoir et Heure */}
+          <Text style={styles.label}>Date butoir</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }}>
             <TouchableOpacity
               style={styles.dateBtn}
@@ -174,4 +189,5 @@ const styles = StyleSheet.create({
     width: 36, height: 36, borderRadius: 18, marginHorizontal: 4,
     justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#fff',
   },
+  label: { fontWeight: 'bold', marginTop: 8, marginBottom: 2 },
 });
